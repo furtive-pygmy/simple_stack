@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  web:
+    container_name: simple_stack_web
+    image: nginx:latest
+    volumes:
+      - ./:/var/www/simple_stack
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 8089:80
+  php:
+    container_name: simple_stack_php
+    user: 1000:1000
+    build:
+      context: ./docker/php
+    volumes:
+      - ./:/var/www/simple_stack
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini:ro
+  db:
+    container_name: simple_stack_db
+    image: mariadb:latest
+    ports:
+      - 4099:3306
+    volumes:
+      - ./var/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: '123456'
+      MYSQL_USER: '123456'
+      MYSQL_PASS: '123456'
+  node:
+    container_name: simple_stack_node
+    tty: true
+    image: node:latest
+    user: 1000:1000
+    volumes:
+      - ./:/var/www/simple_stack
+    working_dir: /var/www/simple_stack
+    environment:
+        NODE_ENV: development
+    ports:
+      - 3999:3000
